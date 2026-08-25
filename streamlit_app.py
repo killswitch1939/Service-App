@@ -8,7 +8,7 @@ st.set_page_config(page_title="Niagara Airlink Quotes", page_icon="🚖", layout
 st.markdown("""
     <head>
         <!-- Android Chrome Home Screen Icon -->
-        <link rel="icon" type="image/png" sizes="192x192" href="https://img.icons8.com/color/512/taxi.png">
+        <link rel="icon" type="image/png" sizes="192x192" href="https://github.com/killswitch1939/Service-App/blob/main/Your%20paragraph%20text%20(5)-Picsart-AiImageEnhancer.png?raw=true">
     </head>
 """, unsafe_allow_html=True)
 

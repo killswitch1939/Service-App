@@ -163,8 +163,8 @@ Pick-up Location : {origin_formatted}
 Drop-off Location : {destination_formatted} 
 
 Number of Guests: {passengers}
-Date: [Date, e.g. September 12th 2026]
-Time: [Time, e.g. 4:30 am]
+Date: [...]
+Time: [...]
 
 The price for the service is {total_cad:.2f} canadian dollars.
 
@@ -175,7 +175,7 @@ Once you confirm the details, we’ll send a secure payment link. Upon receiving
 We look forward to hearing from you soon.
 
 Best regards,
-[Your Name]
+Hina
 Niagara Airlink 
 905-357-8368"""
 

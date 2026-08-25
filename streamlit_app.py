@@ -4,6 +4,14 @@ import requests
 # Page setup
 st.set_page_config(page_title="Niagara Airlink Quotes", page_icon="🚖", layout="centered")
 
+# Custom Home Screen App Icon
+st.markdown("""
+    <head>
+        <!-- Android Chrome Home Screen Icon -->
+        <link rel="icon" type="image/png" sizes="192x192" href="https://img.icons8.com/color/512/taxi.png">
+    </head>
+""", unsafe_allow_html=True)
+
 # Custom CSS for Dark Theme & Receipt Formatting
 st.markdown("""
     <style>

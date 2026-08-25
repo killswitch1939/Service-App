@@ -2,9 +2,9 @@ import streamlit as st
 import requests
 
 # Page setup
-st.set_page_config(page_title="Regional Express Rates", page_icon="🚖", layout="centered")
+st.set_page_config(page_title="Niagara Airlink Quotes", page_icon="🚖", layout="centered")
 
-# Custom CSS for Pure Black Background & Side-by-Side Mobile Layout
+# Custom CSS for Dark Theme & Receipt Formatting
 st.markdown("""
     <style>
     /* Dark Theme Background Setup */
@@ -19,14 +19,14 @@ st.markdown("""
         padding-bottom: 2rem !important;
     }
 
-    /* Input card container background */
+    /* Card container styling */
     div[data-testid="stVerticalBlock"] > div[data-testid="stBlock"] {
         background-color: #121212 !important;
         border: 1px solid #262626 !important;
         border-radius: 12px;
     }
 
-    /* Custom Side-by-Side Rate Card Styling */
+    /* Side-by-Side Rate Card Layout */
     .rate-container {
         display: flex;
         flex-direction: row;
@@ -110,7 +110,7 @@ RATES_CAD = {
     ("WELLAND", "HAMILTON AIRPORT"): 125.00,
 }
 
-# Input Section
+# Input Section Card
 with st.container(border=True):
     st.subheader("📍 Trip Details")
     origin = st.selectbox("Pickup (From)", ORIGINS, index=0)
@@ -132,7 +132,7 @@ surcharge = base_cad * 0.35 if passengers > 4 else 0.0
 total_cad = base_cad + surcharge
 total_usd = total_cad * cad_to_usd
 
-# Side-by-Side Rate Display
+# Rate Display Card
 st.markdown("### 💰 Estimated Rate")
 
 st.markdown(f"""
@@ -148,8 +148,45 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# Trip Summary
+# Format Route Names Nicely (e.g. "NIAGARA FALLS" -> "Niagara Falls")
+origin_formatted = origin.title()
+destination_formatted = destination.title()
+
+# Generate Confirmation Email / Receipt Template
+receipt_template = f"""Hello [Customer Name],
+
+Thank you for contacting Niagara Airlink.
+
+We currently have availability for your requested transfer:
+
+Pick-up Location : {origin_formatted}
+Drop-off Location : {destination_formatted} 
+
+Number of Guests: {passengers}
+Date: [Date, e.g. September 12th 2026]
+Time: [Time, e.g. 4:30 am]
+
+The price for the service is {total_cad:.2f} canadian dollars.
+
+We will require your flight details for pickup.
+
+Once you confirm the details, we’ll send a secure payment link. Upon receiving your payment, your reservation will be confirmed.
+
+We look forward to hearing from you soon.
+
+Best regards,
+[Your Name]
+Niagara Airlink 
+905-357-8368"""
+
+# Receipt Card Section
+st.markdown("### ✉️ Client Confirmation Email")
 with st.container(border=True):
-    st.caption(f"**Route:** {origin} ➔ {destination}")
-    if surcharge > 0:
-        st.caption(f"Base Rate: ${base_cad:.2f} CAD | Van Surcharge: +${surcharge:.2f} CAD")
+    st.text_area(
+        label="Copy & Edit Receipt Template:",
+        value=receipt_template,
+        height=380,
+        help="You can quickly change [Customer Name], [Date], [Time], or [Your Name] right here before copying."
+    )
+
+    st.caption("💡 Tap inside the text box above to edit customer details or copy the entire receipt directly.")

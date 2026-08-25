@@ -1,30 +1,65 @@
 import streamlit as st
 import requests
 
-# Set page layout and title
+# Page setup
 st.set_page_config(page_title="Regional Express Rates", page_icon="🚖", layout="centered")
 
-# Custom CSS for polished mobile styling
+# Custom CSS for Pure Black Background & Side-by-Side Mobile Layout
 st.markdown("""
     <style>
-    /* Compact top padding for mobile */
-    .block-container { padding-top: 1.5rem; padding-bottom: 2rem; }
-    
-    /* Card container styling */
-    div[data-testid="stVerticalBlock"] > div[style*="flex-direction: column"] {
-        background-color: rgba(255, 255, 255, 0.03);
+    /* Dark Theme Background Setup */
+    .stApp {
+        background-color: #000000 !important;
+        color: #FFFFFF !important;
+    }
+
+    /* Reduce default top padding */
+    .block-container {
+        padding-top: 1.5rem !important;
+        padding-bottom: 2rem !important;
+    }
+
+    /* Input card container background */
+    div[data-testid="stVerticalBlock"] > div[data-testid="stBlock"] {
+        background-color: #121212 !important;
+        border: 1px solid #262626 !important;
         border-radius: 12px;
     }
+
+    /* Custom Side-by-Side Rate Card Styling */
+    .rate-container {
+        display: flex;
+        flex-direction: row;
+        gap: 12px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
     
-    /* High contrast price metrics */
-    div[data-testid="stMetricValue"] {
-        font-size: 1.8rem !important;
-        font-weight: 700 !important;
+    .rate-card {
+        flex: 1;
+        background-color: #1a1a1a;
+        border: 1px solid #333333;
+        border-radius: 10px;
+        padding: 16px;
+        text-align: center;
+    }
+
+    .rate-label {
+        font-size: 0.85rem;
+        color: #aaaaaa;
+        font-weight: 600;
+        margin-bottom: 4px;
+    }
+
+    .rate-value {
+        font-size: 1.6rem;
+        color: #ffffff;
+        font-weight: 700;
     }
     </style>
 """, unsafe_allow_html=True)
 
-# Live exchange rate fetcher
+# Fetch exchange rate
 @st.cache_data(ttl=3600)
 def get_cad_to_usd_rate():
     try:
@@ -75,12 +110,11 @@ RATES_CAD = {
     ("WELLAND", "HAMILTON AIRPORT"): 125.00,
 }
 
-# Input Section Card
+# Input Section
 with st.container(border=True):
     st.subheader("📍 Trip Details")
     origin = st.selectbox("Pickup (From)", ORIGINS, index=0)
     
-    # Filter destinations to prevent picking the same location as origin
     valid_destinations = [loc for loc in DESTINATIONS if loc != origin]
     destination = st.selectbox("Dropoff (To)", valid_destinations, index=0)
     
@@ -91,25 +125,31 @@ with st.container(border=True):
     else:
         st.caption("🚗 **Standard Sedan / SUV vehicle**")
 
-# Calculation Logic
+# Calculation
 base_cad = RATES_CAD.get((origin, destination)) or RATES_CAD.get((destination, origin), 150.00)
 surcharge = base_cad * 0.35 if passengers > 4 else 0.0
 
 total_cad = base_cad + surcharge
 total_usd = total_cad * cad_to_usd
 
-# Results Display Card
+# Side-by-Side Rate Display
 st.markdown("### 💰 Estimated Rate")
 
-with st.container(border=True):
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.metric(label="CAD Total", value=f"${total_cad:.2f}")
-    with col2:
-        st.metric(label="USD Total", value=f"${total_usd:.2f}")
+st.markdown(f"""
+    <div class="rate-container">
+        <div class="rate-card">
+            <div class="rate-label">TOTAL (CAD)</div>
+            <div class="rate-value">${total_cad:.2f}</div>
+        </div>
+        <div class="rate-card">
+            <div class="rate-label">TOTAL (USD)</div>
+            <div class="rate-value">${total_usd:.2f}</div>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
 
-    st.markdown("---")
+# Trip Summary
+with st.container(border=True):
     st.caption(f"**Route:** {origin} ➔ {destination}")
     if surcharge > 0:
-        st.caption(f"Base: ${base_cad:.2f} CAD | Van Surcharge: +${surcharge:.2f} CAD")
+        st.caption(f"Base Rate: ${base_cad:.2f} CAD | Van Surcharge: +${surcharge:.2f} CAD")

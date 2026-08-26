@@ -134,15 +134,19 @@ with st.container(border=True):
     passengers = st.number_input("Passengers", min_value=1, max_value=14, value=1, step=1)
 
 # Bidirectional Rate Lookup: Checks (A, B) and (B, A)
-total_cad = RATES_CAD.get((origin, destination)) or RATES_CAD.get((destination, origin))
+base_cad = RATES_CAD.get((origin, destination)) or RATES_CAD.get((destination, origin))
 
-if total_cad is None:
+if base_cad is None:
     st.error("Rate not configured for this specific route. Please select a listed route combination.")
     total_cad = 0.0
     total_usd = 0.0
 else:
+    # Double the total rate if passenger count exceeds 6
+    rate_multiplier = 2.0 if passengers > 6 else 1.0
+    
+    total_cad = base_cad * rate_multiplier
     total_usd = total_cad * cad_to_usd
-
+    
 # Rate Display Card
 st.markdown("### 💰 Estimated Rate")
 

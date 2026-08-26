@@ -4,14 +4,16 @@ import requests
 # Page setup
 st.set_page_config(page_title="Niagara Airlink Quotes", page_icon="🚖", layout="centered")
 
-# Dark Theme & CSS
+# Custom CSS for Dark Theme & Card Layouts
 st.markdown("""
     <style>
+    /* Dark Theme Setup */
     .stApp {
         background-color: #000000 !important;
         color: #FFFFFF !important;
     }
 
+    /* Reduce default top padding */
     .block-container {
         padding-top: 1.5rem !important;
         padding-bottom: 2rem !important;
@@ -27,7 +29,7 @@ st.markdown("""
         visibility: hidden !important;
     }
 
-    /* Card containers */
+    /* Input & receipt card containers */
     div[data-testid="stVerticalBlock"] > div[data-testid="stBlock"] {
         background-color: #121212 !important;
         border: 1px solid #262626 !important;
@@ -126,15 +128,23 @@ RATES_CAD = {
     ("FORT ERIE", "TORONTO AIRPORT"): 280.00,
 }
 
-# Input Section Card (No text inputs = No mobile keyboard)
+# Input Section Card (searchable=False prevents keyboard trigger)
 with st.container(border=True):
     st.subheader("📍 Trip Details")
-    
-    # Radio buttons render as direct tap targets on mobile without opening keyboard
-    origin = st.radio("Pickup (From)", ALL_LOCATIONS, index=ALL_LOCATIONS.index("NIAGARA FALLS"))
+    origin = st.selectbox(
+        "Pickup (From)", 
+        ALL_LOCATIONS, 
+        index=ALL_LOCATIONS.index("NIAGARA FALLS"),
+        searchable=False
+    )
     
     valid_destinations = [loc for loc in ALL_LOCATIONS if loc != origin]
-    destination = st.radio("Dropoff (To)", valid_destinations, index=0)
+    destination = st.selectbox(
+        "Dropoff (To)", 
+        valid_destinations, 
+        index=0,
+        searchable=False
+    )
     
     passengers = st.number_input("Passengers", min_value=1, max_value=14, value=1, step=1)
     

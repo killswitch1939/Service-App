@@ -26,6 +26,13 @@ st.markdown("""
         border-radius: 0px;
     }
 
+    /* PREVENT MOBILE KEYBOARD POPUP ON DROPDOWNS */
+    div[data-baseweb="select"] input {
+        inputmode: none !important;
+        caret-color: transparent !important;
+        pointer-events: none !important;
+    }
+
     /* Side-by-Side Rate Cards */
     .rate-container {
         display: flex;

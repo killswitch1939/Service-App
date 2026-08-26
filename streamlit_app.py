@@ -153,7 +153,7 @@ st.markdown("### 💰 Estimated Rate")
 st.markdown(f"""
     <div class="rate-container">
         <div class="rate-card">
-            <div class="rate-label">TOTAL (CAD)</div>
+            <div class="rate-label">TOTAL (CAD) 🇨🇦</div>
             <div class="rate-value">${total_cad:.2f}</div>
         </div>
         <div class="rate-card">

@@ -4,14 +4,6 @@ import requests
 # Page setup
 st.set_page_config(page_title="Niagara Airlink Quotes", page_icon="🚖", layout="centered")
 
-# Custom Home Screen App Icon
-st.markdown("""
-    <head>
-        <!-- Android Chrome Home Screen Icon -->
-        <link rel="icon" type="image/png" sizes="192x192" href="https://github.com/killswitch1939/Service-App/blob/main/Your%20paragraph%20text%20(5)-Picsart-AiImageEnhancer.png?raw=true">
-    </head>
-""", unsafe_allow_html=True)
-
 # Custom CSS for Dark Theme & Receipt Formatting
 st.markdown("""
     <style>
@@ -99,23 +91,22 @@ DESTINATIONS = [
 ]
 
 RATES_CAD = {
-    ("NIAGARA FALLS", "TORONTO AIRPORT"): 195.00,
-    ("NIAGARA FALLS", "DOWNTOWN TORONTO"): 215.00,
-    ("NIAGARA FALLS", "BUFFALO AIRPORT"): 110.00,
-    ("NIAGARA FALLS", "HAMILTON AIRPORT"): 135.00,
-    ("NIAGARA FALLS", "NIAGARA ON THE LAKE"): 45.00,
-    ("NIAGARA FALLS", "WELLAND"): 40.00,
+    ("NIAGARA FALLS", "TORONTO AIRPORT"): 275.00,
+    ("NIAGARA FALLS", "DOWNTOWN TORONTO"): 335.00,
+    ("NIAGARA FALLS", "BUFFALO AIRPORT"): 155.00,
+    ("NIAGARA FALLS", "HAMILTON AIRPORT"): 175.00,
+    ("NIAGARA FALLS", "NIAGARA ON THE LAKE"): 75.00,
+    ("NIAGARA FALLS", "WELLAND"): 65.00,
 
-    ("NIAGARA ON THE LAKE", "TORONTO AIRPORT"): 190.00,
-    ("NIAGARA ON THE LAKE", "DOWNTOWN TORONTO"): 210.00,
-    ("NIAGARA ON THE LAKE", "BUFFALO AIRPORT"): 120.00,
-    ("NIAGARA ON THE LAKE", "HAMILTON AIRPORT"): 140.00,
-    ("NIAGARA ON THE LAKE", "WELLAND"): 50.00,
+    ("NIAGARA ON THE LAKE", "TORONTO AIRPORT"): 280.00,
+    ("NIAGARA ON THE LAKE", "DOWNTOWN TORONTO"): 390.00,
+    ("NIAGARA ON THE LAKE", "BUFFALO AIRPORT"): 225.00,
+    ("NIAGARA ON THE LAKE", "HAMILTON AIRPORT"): 275.00,
 
-    ("WELLAND", "TORONTO AIRPORT"): 195.00,
-    ("WELLAND", "DOWNTOWN TORONTO"): 210.00,
-    ("WELLAND", "BUFFALO AIRPORT"): 115.00,
-    ("WELLAND", "HAMILTON AIRPORT"): 125.00,
+    ("WELLAND", "TORONTO AIRPORT"): 295.00,
+    ("WELLAND", "DOWNTOWN TORONTO"): 350.00,
+    ("WELLAND", "BUFFALO AIRPORT"): 230.00,
+    ("WELLAND", "HAMILTON AIRPORT"): 250.00,
 }
 
 # Input Section Card

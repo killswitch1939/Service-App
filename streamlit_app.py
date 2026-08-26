@@ -1,10 +1,11 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import requests
 
 # Page setup
 st.set_page_config(page_title="Niagara Airlink Quotes", page_icon="🚖", layout="centered")
 
-# Custom CSS for Dark Theme & Preventing Mobile Keyboard Focus
+# Custom CSS for Dark Theme & Card Layouts
 st.markdown("""
     <style>
     /* Dark Theme Setup */
@@ -27,13 +28,6 @@ st.markdown("""
     footer {
         display: none !important;
         visibility: hidden !important;
-    }
-
-    /* DISABLE MOBILE KEYBOARD ON SELECTBOX INPUTS */
-    div[data-baseweb="select"] input {
-        pointer-events: none !important;
-        user-select: none !important;
-        -webkit-user-select: none !important;
     }
 
     /* Input & receipt card containers */
@@ -139,7 +133,6 @@ RATES_CAD = {
 with st.container(border=True):
     st.subheader("📍 Trip Details")
     
-    # Standard selectboxes without invalid parameters
     origin = st.selectbox("Pickup (From)", ALL_LOCATIONS, index=ALL_LOCATIONS.index("NIAGARA FALLS"))
     
     valid_destinations = [loc for loc in ALL_LOCATIONS if loc != origin]
@@ -220,3 +213,19 @@ with st.container(border=True):
     )
 
     st.caption("💡 Tap inside the text box above to edit details or copy the entire receipt directly.")
+
+# JavaScript DOM Override: Force readonly & disable inputmode on ALL select inputs on page load
+components.html("""
+    <script>
+    function lockInputs() {
+        const inputs = window.parent.document.querySelectorAll('div[data-baseweb="select"] input');
+        inputs.forEach(input => {
+            input.setAttribute('readonly', 'readonly');
+            input.setAttribute('inputmode', 'none');
+            input.style.caretColor = 'transparent';
+        });
+    }
+    // Run repeatedly to catch dynamic re-renders
+    setInterval(lockInputs, 300);
+    </script>
+""", height=0)

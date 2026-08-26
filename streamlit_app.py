@@ -90,7 +90,9 @@ ALL_LOCATIONS = sorted(list(set([
     "VAUGHAN",
     "KITCHNER/WATERLOO AIRPORT",
     "NIAGARA FALLS NY AIRPORT",
-    "FORT ERIE"
+    "FORT ERIE",
+    "PELHAM/FONTHILL",
+    "SCARBOROGH"
 ])))
 
 # Exact CAD Rate Table
@@ -103,7 +105,8 @@ RATES_CAD = {
     ("NIAGARA FALLS", "WELLAND"): 65.00,
     ("NIAGARA FALLS", "VAUGHAN"): 300.00,
     ("NIAGARA FALLS", "KITCHNER/WATERLOO AIRPORT"): 280.00,
-    ("NIAGARA FALLS", "NIAGARA FALLS NY AIRPORT"): 100.00,
+    ("NIAGARA FALLS", "NIAGARA FALLS NY AIRPORT"): 280.00,
+    ("NIAGARA FALLS", "SCARBOROGH"): 350.00,
 
     ("NIAGARA ON THE LAKE", "TORONTO AIRPORT"): 280.00,
     ("NIAGARA ON THE LAKE", "DOWNTOWN TORONTO"): 390.00,
@@ -116,6 +119,8 @@ RATES_CAD = {
     ("WELLAND", "HAMILTON AIRPORT"): 250.00,
 
     ("FORT ERIE", "TORONTO AIRPORT"): 280.00,
+
+    ("PELHAM/FONTHILL", "TORONTO AIRPORT"): 285.00,
 }
 
 # Input Section Card
@@ -165,14 +170,14 @@ Thank you for contacting Niagara Airlink.
 
 We currently have availability for your requested transfer:
 
-Pick-up Location : {origin_formatted}
-Drop-off Location : {destination_formatted} 
+Pick-up Location: {origin_formatted}
+Drop-off Location: {destination_formatted} 
 
 Number of Guests: {passengers}
-Date: [Date, e.g. September 12th 2026]
-Time: [Time, e.g. 4:30 am]
+Date: [...]
+Time: [...]
 
-The price for the service is {total_cad:.2f} canadian dollars.
+The price for the service is {total_cad:.2f} Canadian dollars.
 
 We will require your flight details for pickup.
 

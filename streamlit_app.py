@@ -1,11 +1,10 @@
 import streamlit as st
-import streamlit.components.v1 as components
 import requests
 
 # Page setup
 st.set_page_config(page_title="Niagara Airlink Quotes", page_icon="🚖", layout="centered")
 
-# Custom CSS for Dark Theme & Card Layouts
+# Custom CSS for Dark Theme & Clean Layouts
 st.markdown("""
     <style>
     /* Dark Theme Setup */
@@ -129,14 +128,20 @@ RATES_CAD = {
     ("FORT ERIE", "TORONTO AIRPORT"): 280.00,
 }
 
-# Input Section Card
+# Input Section Card (Tap-only pills, zero mobile keyboard popups)
 with st.container(border=True):
     st.subheader("📍 Trip Details")
     
-    origin = st.selectbox("Pickup (From)", ALL_LOCATIONS, index=ALL_LOCATIONS.index("NIAGARA FALLS"))
+    origin = st.pills("Pickup (From)", ALL_LOCATIONS, selection_mode="single", default="NIAGARA FALLS")
     
+    if not origin:
+        origin = "NIAGARA FALLS"
+
     valid_destinations = [loc for loc in ALL_LOCATIONS if loc != origin]
-    destination = st.selectbox("Dropoff (To)", valid_destinations, index=0)
+    destination = st.pills("Dropoff (To)", valid_destinations, selection_mode="single", default=valid_destinations[0])
+    
+    if not destination:
+        destination = valid_destinations[0]
     
     passengers = st.number_input("Passengers", min_value=1, max_value=14, value=1, step=1)
     
@@ -213,19 +218,3 @@ with st.container(border=True):
     )
 
     st.caption("💡 Tap inside the text box above to edit details or copy the entire receipt directly.")
-
-# JavaScript DOM Override: Force readonly & disable inputmode on ALL select inputs on page load
-components.html("""
-    <script>
-    function lockInputs() {
-        const inputs = window.parent.document.querySelectorAll('div[data-baseweb="select"] input');
-        inputs.forEach(input => {
-            input.setAttribute('readonly', 'readonly');
-            input.setAttribute('inputmode', 'none');
-            input.style.caretColor = 'transparent';
-        });
-    }
-    // Run repeatedly to catch dynamic re-renders
-    setInterval(lockInputs, 300);
-    </script>
-""", height=0)

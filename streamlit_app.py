@@ -4,7 +4,7 @@ import requests
 # Page setup
 st.set_page_config(page_title="Niagara Airlink Quotes", page_icon="🚖", layout="centered")
 
-# Custom CSS for Dark Theme & Card Layouts
+# Custom CSS for Dark Theme & Preventing Mobile Keyboard Focus
 st.markdown("""
     <style>
     /* Dark Theme Setup */
@@ -17,6 +17,23 @@ st.markdown("""
     .block-container {
         padding-top: 1.5rem !important;
         padding-bottom: 2rem !important;
+    }
+
+    /* Hide Streamlit Header, Footer, and Manage app button */
+    div[data-testid="stStatusWidget"],
+    button[title="Manage app"],
+    header[data-testid="stHeader"],
+    #MainMenu,
+    footer {
+        display: none !important;
+        visibility: hidden !important;
+    }
+
+    /* DISABLE MOBILE KEYBOARD ON SELECTBOX INPUTS */
+    div[data-baseweb="select"] input {
+        pointer-events: none !important;
+        user-select: none !important;
+        -webkit-user-select: none !important;
     }
 
     /* Input & receipt card containers */
@@ -78,7 +95,7 @@ st.title("🚖 Transport Quote")
 status_badge = f"🟢 Live Exchange: 1 CAD = ${cad_to_usd:.4f} USD" if is_live else f"🟡 Offline Rate: 1 CAD = ${cad_to_usd:.4f} USD"
 st.caption(status_badge)
 
-# Location list
+# Locations list
 ALL_LOCATIONS = sorted(list(set([
     "NIAGARA FALLS",
     "TORONTO AIRPORT",
@@ -121,6 +138,8 @@ RATES_CAD = {
 # Input Section Card
 with st.container(border=True):
     st.subheader("📍 Trip Details")
+    
+    # Standard selectboxes without invalid parameters
     origin = st.selectbox("Pickup (From)", ALL_LOCATIONS, index=ALL_LOCATIONS.index("NIAGARA FALLS"))
     
     valid_destinations = [loc for loc in ALL_LOCATIONS if loc != origin]
@@ -131,7 +150,7 @@ with st.container(border=True):
     if passengers > 6:
         st.caption("🚐 **Large group (>6 passengers):** Double vehicle rate applied.")
 
-# Calculation Module (Base lookup + Group Multiplier)
+# Calculation Module
 base_cad = RATES_CAD.get((origin, destination)) or RATES_CAD.get((destination, origin))
 
 if base_cad is None:
@@ -139,9 +158,7 @@ if base_cad is None:
     total_cad = 0.0
     total_usd = 0.0
 else:
-    # Double the price if group is over 6 people
     rate_multiplier = 2.0 if passengers > 6 else 1.0
-    
     total_cad = base_cad * rate_multiplier
     total_usd = total_cad * cad_to_usd
 

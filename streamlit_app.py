@@ -23,7 +23,7 @@ st.markdown("""
     div[data-testid="stVerticalBlock"] > div[data-testid="stBlock"] {
         background-color: #121212 !important;
         border: 1px solid #262626 !important;
-        border-radius: 12px;
+        border-radius: 0px;
     }
 
     /* Side-by-Side Rate Cards */
@@ -39,7 +39,7 @@ st.markdown("""
         flex: 1;
         background-color: #1a1a1a;
         border: 1px solid #333333;
-        border-radius: 10px;
+        border-radius: 0px;
         padding: 16px;
         text-align: center;
     }

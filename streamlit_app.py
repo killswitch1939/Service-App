@@ -1,10 +1,11 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import requests
 
 # Page setup
 st.set_page_config(page_title="Niagara Airlink Quotes", page_icon="🚖", layout="centered")
 
-# Custom CSS for Dark Theme & Clean Layouts
+# Custom CSS for Dark Theme & Card Layouts
 st.markdown("""
     <style>
     /* Dark Theme Setup */
@@ -128,20 +129,14 @@ RATES_CAD = {
     ("FORT ERIE", "TORONTO AIRPORT"): 280.00,
 }
 
-# Input Section Card (Tap-only pills, zero mobile keyboard popups)
+# Input Section Card
 with st.container(border=True):
     st.subheader("📍 Trip Details")
     
-    origin = st.pills("Pickup (From)", ALL_LOCATIONS, selection_mode="single", default="NIAGARA FALLS")
+    origin = st.selectbox("Pickup (From)", ALL_LOCATIONS, index=ALL_LOCATIONS.index("NIAGARA FALLS"))
     
-    if not origin:
-        origin = "NIAGARA FALLS"
-
     valid_destinations = [loc for loc in ALL_LOCATIONS if loc != origin]
-    destination = st.pills("Dropoff (To)", valid_destinations, selection_mode="single", default=valid_destinations[0])
-    
-    if not destination:
-        destination = valid_destinations[0]
+    destination = st.selectbox("Dropoff (To)", valid_destinations, index=0)
     
     passengers = st.number_input("Passengers", min_value=1, max_value=14, value=1, step=1)
     
@@ -218,3 +213,43 @@ with st.container(border=True):
     )
 
     st.caption("💡 Tap inside the text box above to edit details or copy the entire receipt directly.")
+
+# JavaScript DOM Override: Prevent mobile keyboard from appearing on selectbox inputs
+components.html("""
+    <script>
+    function lockInput(input) {
+        input.setAttribute('readonly', 'readonly');
+        input.setAttribute('inputmode', 'none');
+        input.readOnly = true;
+        input.style.caretColor = 'transparent';
+
+        if (!input.dataset.kbLocked) {
+            input.dataset.kbLocked = 'true';
+            // Instantly blur on focus so the OS never has time to raise the keyboard
+            input.addEventListener('focus', function () {
+                this.blur();
+            });
+            input.addEventListener('touchstart', function () {
+                this.blur();
+            }, { passive: true });
+        }
+    }
+
+    function lockInputs() {
+        const inputs = window.parent.document.querySelectorAll('div[data-baseweb="select"] input');
+        inputs.forEach(lockInput);
+    }
+
+    // Re-apply immediately whenever Streamlit/React re-renders the DOM
+    const observer = new MutationObserver(lockInputs);
+    observer.observe(window.parent.document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true
+    });
+
+    // Fallback in case the observer misses a fast re-render
+    lockInputs();
+    setInterval(lockInputs, 150);
+    </script>
+""", height=0)

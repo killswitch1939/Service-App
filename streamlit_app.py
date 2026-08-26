@@ -4,10 +4,10 @@ import requests
 # Page setup
 st.set_page_config(page_title="Niagara Airlink Quotes", page_icon="🚖", layout="centered")
 
-# Custom CSS for Dark Theme & Receipt Formatting
+# Custom CSS for Dark Theme & Card Layouts
 st.markdown("""
     <style>
-    /* Dark Theme Background Setup */
+    /* Dark Theme Setup */
     .stApp {
         background-color: #000000 !important;
         color: #FFFFFF !important;
@@ -19,14 +19,14 @@ st.markdown("""
         padding-bottom: 2rem !important;
     }
 
-    /* Card container styling */
+    /* Input & receipt card containers */
     div[data-testid="stVerticalBlock"] > div[data-testid="stBlock"] {
         background-color: #121212 !important;
         border: 1px solid #262626 !important;
         border-radius: 12px;
     }
 
-    /* Side-by-Side Rate Card Layout */
+    /* Side-by-Side Rate Cards */
     .rate-container {
         display: flex;
         flex-direction: row;
@@ -59,7 +59,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Fetch exchange rate
+# Fetch live exchange rate
 @st.cache_data(ttl=3600)
 def get_cad_to_usd_rate():
     try:
@@ -78,18 +78,22 @@ st.title("🚖 Transport Quote")
 status_badge = f"🟢 Live Exchange: 1 CAD = ${cad_to_usd:.4f} USD" if is_live else f"🟡 Offline Rate: 1 CAD = ${cad_to_usd:.4f} USD"
 st.caption(status_badge)
 
-# Locations setup
-ORIGINS = ["NIAGARA FALLS", "NIAGARA ON THE LAKE", "WELLAND"]
-DESTINATIONS = [
+# Accurate location list derived from rates dictionary
+ALL_LOCATIONS = sorted(list(set([
+    "NIAGARA FALLS",
     "TORONTO AIRPORT",
     "DOWNTOWN TORONTO",
     "BUFFALO AIRPORT",
     "HAMILTON AIRPORT",
-    "NIAGARA FALLS",
     "NIAGARA ON THE LAKE",
-    "WELLAND"
-]
+    "WELLAND",
+    "VAUGHAN",
+    "KITCHNER/WATERLOO AIRPORT",
+    "NIAGARA FALLS NY AIRPORT",
+    "FORT ERIE"
+])))
 
+# Exact CAD Rate Table
 RATES_CAD = {
     ("NIAGARA FALLS", "TORONTO AIRPORT"): 275.00,
     ("NIAGARA FALLS", "DOWNTOWN TORONTO"): 335.00,
@@ -97,6 +101,9 @@ RATES_CAD = {
     ("NIAGARA FALLS", "HAMILTON AIRPORT"): 175.00,
     ("NIAGARA FALLS", "NIAGARA ON THE LAKE"): 75.00,
     ("NIAGARA FALLS", "WELLAND"): 65.00,
+    ("NIAGARA FALLS", "VAUGHAN"): 300.00,
+    ("NIAGARA FALLS", "KITCHNER/WATERLOO AIRPORT"): 280.00,
+    ("NIAGARA FALLS", "NIAGARA FALLS NY AIRPORT"): 280.00,
 
     ("NIAGARA ON THE LAKE", "TORONTO AIRPORT"): 280.00,
     ("NIAGARA ON THE LAKE", "DOWNTOWN TORONTO"): 390.00,
@@ -107,29 +114,29 @@ RATES_CAD = {
     ("WELLAND", "DOWNTOWN TORONTO"): 350.00,
     ("WELLAND", "BUFFALO AIRPORT"): 230.00,
     ("WELLAND", "HAMILTON AIRPORT"): 250.00,
+
+    ("FORT ERIE", "TORONTO AIRPORT"): 280.00,
 }
 
 # Input Section Card
 with st.container(border=True):
     st.subheader("📍 Trip Details")
-    origin = st.selectbox("Pickup (From)", ORIGINS, index=0)
+    origin = st.selectbox("Pickup (From)", ALL_LOCATIONS, index=ALL_LOCATIONS.index("NIAGARA FALLS"))
     
-    valid_destinations = [loc for loc in DESTINATIONS if loc != origin]
+    valid_destinations = [loc for loc in ALL_LOCATIONS if loc != origin]
     destination = st.selectbox("Dropoff (To)", valid_destinations, index=0)
     
     passengers = st.number_input("Passengers", min_value=1, max_value=14, value=1, step=1)
-    
-    if passengers > 4:
-        st.caption("🚐 **XL Passenger Van required** (35% group surcharge applied)")
-    else:
-        st.caption("🚗 **Standard Sedan / SUV vehicle**")
 
-# Calculation
-base_cad = RATES_CAD.get((origin, destination)) or RATES_CAD.get((destination, origin), 150.00)
-surcharge = base_cad * 0.35 if passengers > 4 else 0.0
+# Bidirectional Rate Lookup: Checks (A, B) and (B, A)
+total_cad = RATES_CAD.get((origin, destination)) or RATES_CAD.get((destination, origin))
 
-total_cad = base_cad + surcharge
-total_usd = total_cad * cad_to_usd
+if total_cad is None:
+    st.error("Rate not configured for this specific route. Please select a listed route combination.")
+    total_cad = 0.0
+    total_usd = 0.0
+else:
+    total_usd = total_cad * cad_to_usd
 
 # Rate Display Card
 st.markdown("### 💰 Estimated Rate")
@@ -147,11 +154,11 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# Format Route Names Nicely (e.g. "NIAGARA FALLS" -> "Niagara Falls")
+# Format route names nicely
 origin_formatted = origin.title()
 destination_formatted = destination.title()
 
-# Generate Confirmation Email / Receipt Template
+# Receipt Template
 receipt_template = f"""Hello [Customer Name],
 
 Thank you for contacting Niagara Airlink.
@@ -162,8 +169,8 @@ Pick-up Location : {origin_formatted}
 Drop-off Location : {destination_formatted} 
 
 Number of Guests: {passengers}
-Date: [...]
-Time: [...]
+Date: [Date, e.g. September 12th 2026]
+Time: [Time, e.g. 4:30 am]
 
 The price for the service is {total_cad:.2f} canadian dollars.
 
@@ -174,7 +181,7 @@ Once you confirm the details, we’ll send a secure payment link. Upon receiving
 We look forward to hearing from you soon.
 
 Best regards,
-Hina
+[Your Name]
 Niagara Airlink 
 905-357-8368"""
 
@@ -185,7 +192,7 @@ with st.container(border=True):
         label="Copy & Edit Receipt Template:",
         value=receipt_template,
         height=380,
-        help="You can quickly change [Customer Name], [Date], [Time], or [Your Name] right here before copying."
+        help="Edit details directly here before copying."
     )
 
-    st.caption("💡 Tap inside the text box above to edit customer details or copy the entire receipt directly.")
+    st.caption("💡 Tap inside the text box above to edit details or copy the entire receipt directly.")

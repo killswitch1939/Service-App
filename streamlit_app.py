@@ -154,7 +154,7 @@ st.markdown(f"""
     <div class="rate-container">
         <div class="rate-card">
             <div style="font-size: 24px;">🇨🇦</div>
-            <div class="rate-label">TOTAL (CAD) 🇨🇦</div>
+            <div class="rate-label">TOTAL (CAD)</div>
             <div class="rate-value">${total_cad:.2f}</div>
         </div>
         <div class="rate-card">

@@ -19,16 +19,6 @@ st.markdown("""
         padding-bottom: 2rem !important;
     }
 
-    /* Hide Streamlit Header, Footer, and Manage app button */
-    div[data-testid="stStatusWidget"],
-    button[title="Manage app"],
-    header[data-testid="stHeader"],
-    #MainMenu,
-    footer {
-        display: none !important;
-        visibility: hidden !important;
-    }
-
     /* Input & receipt card containers */
     div[data-testid="stVerticalBlock"] > div[data-testid="stBlock"] {
         background-color: #121212 !important;
@@ -88,7 +78,7 @@ st.title("🚖 Transport Quote")
 status_badge = f"🟢 Live Exchange: 1 CAD = ${cad_to_usd:.4f} USD" if is_live else f"🟡 Offline Rate: 1 CAD = ${cad_to_usd:.4f} USD"
 st.caption(status_badge)
 
-# Locations list
+# Location list
 ALL_LOCATIONS = sorted(list(set([
     "NIAGARA FALLS",
     "TORONTO AIRPORT",
@@ -128,30 +118,20 @@ RATES_CAD = {
     ("FORT ERIE", "TORONTO AIRPORT"): 280.00,
 }
 
-# Input Section Card (searchable=False prevents keyboard trigger)
+# Input Section Card
 with st.container(border=True):
     st.subheader("📍 Trip Details")
-    origin = st.selectbox(
-        "Pickup (From)", 
-        ALL_LOCATIONS, 
-        index=ALL_LOCATIONS.index("NIAGARA FALLS"),
-        searchable=False
-    )
+    origin = st.selectbox("Pickup (From)", ALL_LOCATIONS, index=ALL_LOCATIONS.index("NIAGARA FALLS"))
     
     valid_destinations = [loc for loc in ALL_LOCATIONS if loc != origin]
-    destination = st.selectbox(
-        "Dropoff (To)", 
-        valid_destinations, 
-        index=0,
-        searchable=False
-    )
+    destination = st.selectbox("Dropoff (To)", valid_destinations, index=0)
     
     passengers = st.number_input("Passengers", min_value=1, max_value=14, value=1, step=1)
     
     if passengers > 6:
         st.caption("🚐 **Large group (>6 passengers):** Double vehicle rate applied.")
 
-# Calculation Module
+# Calculation Module (Base lookup + Group Multiplier)
 base_cad = RATES_CAD.get((origin, destination)) or RATES_CAD.get((destination, origin))
 
 if base_cad is None:
@@ -159,7 +139,9 @@ if base_cad is None:
     total_cad = 0.0
     total_usd = 0.0
 else:
+    # Double the price if group is over 6 people
     rate_multiplier = 2.0 if passengers > 6 else 1.0
+    
     total_cad = base_cad * rate_multiplier
     total_usd = total_cad * cad_to_usd
 

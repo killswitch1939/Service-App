@@ -13,6 +13,14 @@ st.markdown("""
         color: #FFFFFF !important;
     }
 
+/* Hide the 'Manage app' button on Streamlit Cloud */
+    div[data-testid="stStatusWidget"],
+    button[title="Manage app"],
+    #MainMenu,
+    footer {
+        display: none !important;
+        visibility: hidden !important;
+    }
     /* Reduce default top padding */
     .block-container {
         padding-top: 1.5rem !important;
